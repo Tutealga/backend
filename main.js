@@ -1,86 +1,237 @@
-class Usuario {
-    constructor(nombre, apellido){
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.libros = [];
-        this.mascotas = [];
+const string = (string) => console.log(string);
+
+class Contenedor {
+    constructor(archive){
+        this.archive = archive;
+        this.counter = 0;
     }
 
-    getFullName = () => {
-       return `Nombre completo: ${this.nombre} ${this.apellido}`
+    increaseCounter = () => {
+        this.counter += 1;
     }
 
-    addMascota = (mascota) => {
-        this.mascotas.push(mascota);
+    decreaseCounter = () => {
+        this.counter -= 1;
     }
 
-    countMascotas = () => {
-        return this.mascotas.length
+    setCounter = (number) => {
+        this.counter = number;
     }
 
-    addBook = (libro) => {
-        this.libros.push(libro);
+    async save (object) {
+       if (this.counter === 0) {
+            try{
+                this.increaseCounter();
+                object = {id: this.counter, ...object};
+                await fs.promises.writeFile(this.archive , JSON.stringify([object])); 
+                return this.counter;
+            } catch(err) {
+                console.log(`Ha ocurrido un error: ${err.message}`);
+            }
+       } else {
+            try{
+                this.increaseCounter();
+                object = {id: this.counter, ...object};
+                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
+                fileDate.push(object);
+                await fs.promises.writeFile(this.archive , JSON.stringify(fileDate));
+                return this.counter;
+            } catch(err) {
+                console.log(`Ha ocurrido un error: ${err.message}`);
+            }
+       }
+       return -1;
     }
 
-    getBookNames = () =>{
-        const nombres = [];
-        this.libros.forEach(libro => nombres.push(libro.nombre));
-        return nombres;
+    async getById(id){
+        if (id >= this.counter){
+            return null;
+        } else {
+            try{
+                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
+                return fileDate[id];
+            } catch(err) {
+                console.log(`Ha ocurrido un error: ${err.message}`);
+            }
+        }
+        return null;
+    }
+
+    async getAll(){
+        try{
+            const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
+            return fileDate;
+        } catch(err) {
+            console.log(`Ha ocurrido un error: ${err.message}`);
+        }
+    }
+
+    async deleteById (id){
+        if (id >= this.counter){
+            console.log(`El producto con el id ${id} no existe.`);
+        } else {
+            try{
+                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
+                const fileDateEdited = fileDate.splice(id,1);
+                await fs.promises.writeFile(this.archive , JSON.stringify(fileDateEdited));
+                this.decreaseCounter();
+                console.log(`Se ha eliminado correctamente el producto con el id ${id}.`);
+            } catch(err) {
+                console.log(`Ha ocurrido un error: ${err.message}`);
+            }
+        }
+    }
+
+    async deleteAll(){
+        try{
+            if(this.counter !== 0){
+                await fs.promises.writeFile(this.archive , JSON.stringify([]));
+                this.setCounter(0);
+                string("Productos eliminados correctamente.");
+            } else {
+                string("Se encuentra vacio el listado de productos.");
+            }
+            
+        } catch(err) {
+            console.log(`Ha ocurrido un error: ${err.message}`);
+        }   
     }
 
 }
 
-const addBook = () => {
-    let nombre, autor;
-    nombre = prompt("Ingrese el nombre del libro:");
-    autor = prompt("Ingrese el autor del libro:");
-    usuario.addBook({nombre: nombre, autor: autor});
+//Módulo fs:
+const fs = require('fs');
+
+//Contenedor:
+const container = new Contenedor('./products.txt');
+
+//Productos:
+const product1 = {
+    title: 'Orquidea',
+    price: 1000,
+    thumbnail: "https://www.cuerpomente.com/medio/2021/11/17/maceta-con-orquidea-en-un-alfeizar_9512f96a_1200x1200.jpg"
+}
+const product2 = {
+    title: 'Jazmin',
+    price: 900,
+    thumbnail: "https://verdecora.es/blog/wp-content/uploads/2016/03/cultivo-jazmin.jpg.webp"
+}
+const product3 = {
+    title: 'Tulipan',
+    price: 1500,
+    thumbnail: "https://images.hola.com/imagenes/decoracion/20211013197604/cultivar-tulipanes-plantas-interior-exterior-il/1-6-255/cultivar-tulipanes-02a-a.jpg"
 }
 
-const getBooks = () => {
-    alert(`Los libros del usuario son: ${usuario.getBookNames().join(", ")}`);
+//Prueba
+const main = async () => {
+
+const n = "\n";
+
+const saveProduct = (id) => id !== -1 && console.log("El producto ha sido guardado correctamente con el siguiente id: ", id);
+
+const errorMessage = (err) => console.log(`Error: ${err}`);
+  
+
+const getProductById = (res) => {
+         res === null
+         ?
+         string("No se encontró el producto en el array.")
+         :
+         console.log(`El producto encontrado es el siguiente: \n- id: ${res.id}\n- title: ${res.title}\n- price: ${res.price}\n- thumbnail: ${res.thumbnail}`);    
 }
 
-const addMascota = () => {
-    let nombre;
-    nombre = prompt("Ingrese el nombre de la mascota:");
-    usuario.addMascota(nombre);
+    string("Guardar producto 1:");
+    await container.save(product1)
+    .then(id =>{
+        saveProduct(id);
+    })
+    .catch(err => {
+        errorMessage(err);
+    });
+
+    string(n);
+    string("Guardar producto 2:");
+    await container.save(product2)
+    .then(id =>{
+        saveProduct(id);
+    })
+    .catch(err => {
+        errorMessage(err);
+    });
+
+    string(n);
+    string("Guardar producto 3:");
+    await container.save(product3)
+    .then(id =>{
+        saveProduct(id);
+    })
+    .catch(err => {
+        errorMessage(err);
+    });
+    
+string(`
+=======================
+OBTENER PRODUCTO POR ID
+=======================
+`);
+    await container.getById(0)
+    .then(res => {
+        getProductById(res);
+    })
+    .catch(err => {
+        errorMessage(err);
+    });
+
+    string(n);
+    await container.getById(2)
+    .then(res => {
+        getProductById(res);
+    })
+    .catch(err => {
+        errorMessage(err);
+    });
+
+    string(n);
+    await container.getById(4)
+    .then(res => {
+        getProductById(res);
+    })
+    .catch(err => {
+        errorMessage(err);
+    });
+
+string(`
+========================================
+OBTENER EL LISTADO COMPLETO DE PRODUCTOS
+========================================
+`);
+    await container.getAll()
+        .then(res => { 
+            res.forEach(res => {
+                console.log(`El producto n° ${res.id}: \n- id: ${res.id}\n- title: ${res.title}\n- price: ${res.price}\n- thumbnail: ${res.thumbnail}\n`);
+            });
+        })
+        .catch(err => {
+            errorMessage(err)
+        });
+
+string(`
+========================
+ELIMINAR PRODUCTO POR ID
+========================
+`);
+    await container.deleteById(1);
+    string(n);
+    await container.deleteById(5);
+
+string(`
+==================
+ELIMINAR PRODUCTOS
+==================
+`);
+    await container.deleteAll();
+    string(n);
+    await container.deleteAll();
 }
 
-const countMascotas = () => {
-    alert(`La cantidad de mascotas es: ${usuario.countMascotas()}`);
-}
-
-let nombre, apellido, opcion;
-
-nombre = prompt("Ingrese su nombre:");
-apellido = prompt("Ingrese su apellido:");
-
-let usuario = new Usuario(nombre, apellido);
-
-const options = () => { 
- opcion = prompt(`${usuario.getFullName()}\n\n¿Que quiere hacer?\n\n1) Agregar un libro \n2) Obtener libros del usuario\n3) Agregar una mascota\n4) Ver cantidad de mascotas\n5) Finalizar`);
-}
-
-while(opcion !== '5'){
-    options();
-    while(opcion !== '1' & opcion !== '2' & opcion !== '3' & opcion !== '4' & opcion !== '5') {
-     options();
-    }
-
-    if(opcion == 1){
-       addBook();
-    }
-
-    if(opcion == 2){
-        getBooks();        
-    }
-
-    if(opcion == 3){
-        addMascota();
-    }
-
-    if(opcion == 4){
-        countMascotas();
-    }
-}
+main();
