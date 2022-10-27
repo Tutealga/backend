@@ -49,7 +49,10 @@ class Contenedor {
         } else {
             try{
                 const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
-                return fileDate[id];
+                const products = fileDate.find(product => {
+                    return product.id === id
+                });
+                return products
             } catch(err) {
                 console.log(`Ha ocurrido un error: ${err.message}`);
             }
@@ -72,8 +75,9 @@ class Contenedor {
         } else {
             try{
                 const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
-                const fileDateEdited = fileDate.splice(id,1);
-                await fs.promises.writeFile(this.archive , JSON.stringify(fileDateEdited));
+                const index = fileDate.findIndex(product => product.id === id);
+                fileDate.splice(index,1);
+                await fs.promises.writeFile(this.archive , JSON.stringify(fileDate));
                 this.decreaseCounter();
                 console.log(`Se ha eliminado correctamente el producto con el id ${id}.`);
             } catch(err) {
@@ -85,8 +89,11 @@ class Contenedor {
     async deleteAll(){
         try{
             if(this.counter !== 0){
-                await fs.promises.writeFile(this.archive , JSON.stringify([]));
+                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
+                const quantity = fileDate.length;
+                fileDate.splice(0,quantity)
                 this.setCounter(0);
+                await fs.promises.writeFile(this.archive , JSON.stringify(fileDate));
                 string("Productos eliminados correctamente.");
             } else {
                 string("Se encuentra vacio el listado de productos.");
@@ -174,7 +181,7 @@ string(`
 OBTENER PRODUCTO POR ID
 =======================
 `);
-    await container.getById(0)
+    await container.getById(1)
     .then(res => {
         getProductById(res);
     })
@@ -215,23 +222,25 @@ OBTENER EL LISTADO COMPLETO DE PRODUCTOS
             errorMessage(err)
         });
 
-string(`
-========================
-ELIMINAR PRODUCTO POR ID
-========================
-`);
-    await container.deleteById(1);
-    string(n);
-    await container.deleteById(5);
+        string(`
+        ========================
+        ELIMINAR PRODUCTO POR ID
+        ========================
+        `);
+            await container.deleteById(1);
+            string(n);
+            await container.deleteById(5);
+        
+        string(`
+        ==================
+        ELIMINAR PRODUCTOS
+        ==================
+        `);
+        
+        await container.deleteAll();
+        string(n);
+        await container.deleteAll();
 
-string(`
-==================
-ELIMINAR PRODUCTOS
-==================
-`);
-    await container.deleteAll();
-    string(n);
-    await container.deleteAll();
 }
 
 main();
