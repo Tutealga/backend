@@ -1,8 +1,8 @@
 const string = (string) => console.log(string);
 
 class Contenedor {
-    constructor(archive){
-        this.archive = archive;
+    constructor(file){
+        this.file = file;
         this.counter = 0;
     }
 
@@ -23,7 +23,7 @@ class Contenedor {
             try{
                 this.increaseCounter();
                 object = {id: this.counter, ...object};
-                await fs.promises.writeFile(this.archive , JSON.stringify([object])); 
+                await fs.promises.writeFile(this.file , JSON.stringify([object])); 
                 return this.counter;
             } catch(err) {
                 console.log(`Ha ocurrido un error: ${err.message}`);
@@ -32,9 +32,9 @@ class Contenedor {
             try{
                 this.increaseCounter();
                 object = {id: this.counter, ...object};
-                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
-                fileDate.push(object);
-                await fs.promises.writeFile(this.archive , JSON.stringify(fileDate));
+                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
+                fileData.push(object);
+                await fs.promises.writeFile(this.file , JSON.stringify(fileData));
                 return this.counter;
             } catch(err) {
                 console.log(`Ha ocurrido un error: ${err.message}`);
@@ -48,11 +48,11 @@ class Contenedor {
             return null;
         } else {
             try{
-                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
-                const products = fileDate.find(product => {
-                    return product.id === id
+                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
+                const product = fileData.find(products => {
+                    return products.id === id;
                 });
-                return products
+                return product;
             } catch(err) {
                 console.log(`Ha ocurrido un error: ${err.message}`);
             }
@@ -62,8 +62,8 @@ class Contenedor {
 
     async getAll(){
         try{
-            const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
-            return fileDate;
+            const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
+            return fileData;
         } catch(err) {
             console.log(`Ha ocurrido un error: ${err.message}`);
         }
@@ -74,10 +74,10 @@ class Contenedor {
             console.log(`El producto con el id ${id} no existe.`);
         } else {
             try{
-                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
-                const index = fileDate.findIndex(product => product.id === id);
-                fileDate.splice(index,1);
-                await fs.promises.writeFile(this.archive , JSON.stringify(fileDate));
+                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
+                const index = fileData.findIndex(product => product.id === id);
+                fileData.splice(index,1);
+                await fs.promises.writeFile(this.file , JSON.stringify(fileData));
                 this.decreaseCounter();
                 console.log(`Se ha eliminado correctamente el producto con el id ${id}.`);
             } catch(err) {
@@ -89,11 +89,11 @@ class Contenedor {
     async deleteAll(){
         try{
             if(this.counter !== 0){
-                const fileDate = JSON.parse(await fs.promises.readFile(this.archive , 'utf-8'));
-                const quantity = fileDate.length;
-                fileDate.splice(0,quantity)
+                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
+                const quantity = fileData.length;
+                fileData.splice(0,quantity)
                 this.setCounter(0);
-                await fs.promises.writeFile(this.archive , JSON.stringify(fileDate));
+                await fs.promises.writeFile(this.file , JSON.stringify(fileData));
                 string("Productos eliminados correctamente.");
             } else {
                 string("Se encuentra vacio el listado de productos.");
