@@ -1,246 +1,75 @@
-const string = (string) => console.log(string);
-
-class Contenedor {
-    constructor(file){
-        this.file = file;
-        this.counter = 0;
-    }
-
-    increaseCounter = () => {
-        this.counter += 1;
-    }
-
-    decreaseCounter = () => {
-        this.counter -= 1;
-    }
-
-    setCounter = (number) => {
-        this.counter = number;
-    }
-
-    async save (object) {
-       if (this.counter === 0) {
-            try{
-                this.increaseCounter();
-                object = {id: this.counter, ...object};
-                await fs.promises.writeFile(this.file , JSON.stringify([object])); 
-                return this.counter;
-            } catch(err) {
-                console.log(`Ha ocurrido un error: ${err.message}`);
-            }
-       } else {
-            try{
-                this.increaseCounter();
-                object = {id: this.counter, ...object};
-                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
-                fileData.push(object);
-                await fs.promises.writeFile(this.file , JSON.stringify(fileData));
-                return this.counter;
-            } catch(err) {
-                console.log(`Ha ocurrido un error: ${err.message}`);
-            }
-       }
-       return -1;
-    }
-
-    async getById(id){
-        if (id >= this.counter){
-            return null;
-        } else {
-            try{
-                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
-                const product = fileData.find(products => {
-                    return products.id === id;
-                });
-                return product;
-            } catch(err) {
-                console.log(`Ha ocurrido un error: ${err.message}`);
-            }
-        }
-        return null;
-    }
-
-    async getAll(){
-        try{
-            const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
-            return fileData;
-        } catch(err) {
-            console.log(`Ha ocurrido un error: ${err.message}`);
-        }
-    }
-
-    async deleteById (id){
-        if (id >= this.counter){
-            console.log(`El producto con el id ${id} no existe.`);
-        } else {
-            try{
-                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
-                const index = fileData.findIndex(product => product.id === id);
-                fileData.splice(index,1);
-                await fs.promises.writeFile(this.file , JSON.stringify(fileData));
-                this.decreaseCounter();
-                console.log(`Se ha eliminado correctamente el producto con el id ${id}.`);
-            } catch(err) {
-                console.log(`Ha ocurrido un error: ${err.message}`);
-            }
-        }
-    }
-
-    async deleteAll(){
-        try{
-            if(this.counter !== 0){
-                const fileData = JSON.parse(await fs.promises.readFile(this.file , 'utf-8'));
-                const quantity = fileData.length;
-                fileData.splice(0,quantity)
-                this.setCounter(0);
-                await fs.promises.writeFile(this.file , JSON.stringify(fileData));
-                string("Productos eliminados correctamente.");
-            } else {
-                string("Se encuentra vacio el listado de productos.");
-            }
-            
-        } catch(err) {
-            console.log(`Ha ocurrido un error: ${err.message}`);
-        }   
-    }
-
-}
-
-//Módulo fs:
 const fs = require('fs');
 
-//Contenedor:
+const Contenedor = require('./container.js');
+
+const express = require('express');
+
+const productsTable = (products) => {
+    let productsTable = 
+    `<table border="1" align="center" bordercolor="black" cellspacing="2">
+        <caption style="padding: 20px; font-size:20px;"><B>Listado de Productos</B></caption>
+        <tr bgcolor="grey" align="center">
+            <th width=200>Titulo</th>
+            <th width=200>Precio</th>
+            <th width=200>Img</th>
+        </tr>`
+
+    products.forEach(product => {
+        productsTable = productsTable +
+        `<tr align="center">
+            <th width=200>${product.title}</td>
+            <th width=200>${product.price}</td>
+            <th width=200><img src="${product.thumbnail}" alt="${product.title}" width="200" height="200"/></td>
+        </tr>`
+    });
+
+    productsTable = productsTable + `</table>`
+
+    return productsTable;
+}
+
+const productTable = (product) => {
+    const productTable = 
+    `<table border="1" align="center" bordercolor="black" cellspacing="2">
+        <caption style="padding: 20px; font-size:20px;"><B>Producto Random</B></caption>
+        <tr bgcolor="grey" align="center">
+            <th width=200>Titulo</th>
+            <th width=200>Precio</th>
+            <th width=200>Img</th>
+        </tr>
+        <tr align="center">
+            <th width=200>${product.title}</td>
+            <th width=200>${product.price}</td>
+            <th width=200><img src="${product.thumbnail}" alt="${product.title}" width="200" height="200"/></td>
+        </tr>
+    </table>`
+    return productTable;
+}
+
 const container = new Contenedor('./products.txt');
 
-//Productos:
-const product1 = {
-    title: 'Orquidea',
-    price: 1000,
-    thumbnail: "https://www.cuerpomente.com/medio/2021/11/17/maceta-con-orquidea-en-un-alfeizar_9512f96a_1200x1200.jpg"
-}
-const product2 = {
-    title: 'Jazmin',
-    price: 900,
-    thumbnail: "https://verdecora.es/blog/wp-content/uploads/2016/03/cultivo-jazmin.jpg.webp"
-}
-const product3 = {
-    title: 'Tulipan',
-    price: 1500,
-    thumbnail: "https://images.hola.com/imagenes/decoracion/20211013197604/cultivar-tulipanes-plantas-interior-exterior-il/1-6-255/cultivar-tulipanes-02a-a.jpg"
-}
+const app = express();
 
-//Prueba
-const main = async () => {
+app.get('/', (req,res) => {
+    res.send('<h1 style="color:blue;">Bienvenido al Contenedor de Productos.</h1>');
+});
 
-const n = "\n";
+app.get('/productos', async (req,res) => {
+    const products = await container.getAll();
+    let prodTable = productsTable(products);
+    res.send(prodTable);
+});
 
-const saveProduct = (id) => id !== -1 && console.log("El producto ha sido guardado correctamente con el siguiente id: ", id);
+app.get('/productoRandom', async (req,res) => {
+    const product = await container.getAll();
+    const randomNumber = Math.floor(Math.random() * product.length);
+    const prodTable = productTable(product[randomNumber]);
+    res.send(prodTable);
+});
 
-const errorMessage = (err) => console.log(`Error: ${err}`);
-  
+const PORT = process.env.PORT || 8080;
 
-const getProductById = (res) => {
-         res === null
-         ?
-         string("No se encontró el producto en el array.")
-         :
-         console.log(`El producto encontrado es el siguiente: \n- id: ${res.id}\n- title: ${res.title}\n- price: ${res.price}\n- thumbnail: ${res.thumbnail}`);    
-}
-
-    string("Guardar producto 1:");
-    await container.save(product1)
-    .then(id =>{
-        saveProduct(id);
-    })
-    .catch(err => {
-        errorMessage(err);
-    });
-
-    string(n);
-    string("Guardar producto 2:");
-    await container.save(product2)
-    .then(id =>{
-        saveProduct(id);
-    })
-    .catch(err => {
-        errorMessage(err);
-    });
-
-    string(n);
-    string("Guardar producto 3:");
-    await container.save(product3)
-    .then(id =>{
-        saveProduct(id);
-    })
-    .catch(err => {
-        errorMessage(err);
-    });
-    
-string(`
-=======================
-OBTENER PRODUCTO POR ID
-=======================
-`);
-    await container.getById(1)
-    .then(res => {
-        getProductById(res);
-    })
-    .catch(err => {
-        errorMessage(err);
-    });
-
-    string(n);
-    await container.getById(2)
-    .then(res => {
-        getProductById(res);
-    })
-    .catch(err => {
-        errorMessage(err);
-    });
-
-    string(n);
-    await container.getById(4)
-    .then(res => {
-        getProductById(res);
-    })
-    .catch(err => {
-        errorMessage(err);
-    });
-
-string(`
-========================================
-OBTENER EL LISTADO COMPLETO DE PRODUCTOS
-========================================
-`);
-    await container.getAll()
-        .then(res => { 
-            res.forEach(res => {
-                console.log(`El producto n° ${res.id}: \n- id: ${res.id}\n- title: ${res.title}\n- price: ${res.price}\n- thumbnail: ${res.thumbnail}\n`);
-            });
-        })
-        .catch(err => {
-            errorMessage(err)
-        });
-
-        string(`
-        ========================
-        ELIMINAR PRODUCTO POR ID
-        ========================
-        `);
-            await container.deleteById(1);
-            string(n);
-            await container.deleteById(5);
-        
-        string(`
-        ==================
-        ELIMINAR PRODUCTOS
-        ==================
-        `);
-        
-        await container.deleteAll();
-        string(n);
-        await container.deleteAll();
-
-}
-
-main();
+const server = app.listen(PORT, () => {
+    console.log(`Servidor express escuchando en el puerto ${PORT}`);
+});
+server.on('error', err => console.log(`error: ${err}`));
