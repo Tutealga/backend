@@ -7,7 +7,7 @@ const express = require('express');
 const productsTable = (products) => {
     let productsTable = 
     `<table border="1" align="center" bordercolor="black" cellspacing="2">
-        <caption style="padding: 20px; font-size:20px;"><B>Listado de Productos</B></caption>
+        <caption style="padding: 20px; font-size:20px;"><B>Productos</B></caption>
         <tr bgcolor="grey" align="center">
             <th width=200>Titulo</th>
             <th width=200>Precio</th>
@@ -51,20 +51,24 @@ const container = new Contenedor('./products.txt');
 const app = express();
 
 app.get('/', (req,res) => {
-    res.send('<h1 style="color:blue;">Bienvenido al Contenedor de Productos.</h1>');
+    res.send(`
+    <h1>Bienvenido al Contenedor de Productos.</h1>
+    <button><a href="/productos">Productos</a></button>
+    <button><a href="/productoRandom">Producto random</a></button>
+    `);
 });
 
 app.get('/productos', async (req,res) => {
     const products = await container.getAll();
     let prodTable = productsTable(products);
-    res.send(prodTable);
+    res.send('<button><a href="/">Volver</a></button>' + prodTable);
 });
 
 app.get('/productoRandom', async (req,res) => {
     const product = await container.getAll();
     const randomNumber = Math.floor(Math.random() * product.length);
     const prodTable = productTable(product[randomNumber]);
-    res.send(prodTable);
+    res.send('<button><a href="/">Volver</a></button>' + prodTable);
 });
 
 const PORT = process.env.PORT || 8080;
