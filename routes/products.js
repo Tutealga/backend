@@ -11,43 +11,15 @@ const indexById = (id) => {
     return products.findIndex(item => item.id === id);
 }
 
-const checkId = (req, res, next) => {
-    const { id } = req.params;
-
-    if(!id){
-        res.status(400).json({ error : 'Falta ingresar el id.'});
-    } else if (isNaN(parseInt(id))) {
-        res.status(400).json({ error : "El id ingresado no es un número."});
-    }
-
-    next();
-}
-
-const checkProduct = (req, res, next) => {
-    const { title, price, thumbnail } = req.body;
-
-    if(!title){
-        res.status(400).json({ error : 'Falta ingresar el título del producto.'});
-    }
-    if(!price){
-        res.status(400).json({ error : 'Falta ingresar el precio del producto.'});
-    }
-    if(!thumbnail){
-        res.status(400).json({ error : 'Falta ingresar el thumbnail del producto.'});
-    }
-
-    next();
-}
-
-router.get('/', (req, res) => {
+router.get('/productos', (req, res) => {
     if (products.length === 0) {
         res.status(200).json({ error : 'El listado de productos esta vacío.'});
     } else {
-        res.status(200).json(productos);
+        res.status(200).json(products);
     }
 });
 
-router.get('/:id', checkId, (req, res) => {
+router.get('/productos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     if (id < 1 || id > counter) {
         res.status(400).json({ error : "No existe producto con el id indicado."});
@@ -62,7 +34,7 @@ router.get('/:id', checkId, (req, res) => {
     }
 });
 
-router.post('/', checkProduct, (req, res) => {
+router.post('/productos', (req, res) => {
     const { title, price, thumbnail } = req.body;
     counter += 1;
     const product = {
@@ -75,7 +47,7 @@ router.post('/', checkProduct, (req, res) => {
     res.status(200).json(product);
 });
 
-router.put('/:id', checkId, checkProduct, (req, res) => {
+router.put('/productos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const { title, price, thumbnail } = req.body;
 
@@ -97,7 +69,7 @@ router.put('/:id', checkId, checkProduct, (req, res) => {
     }
 });
 
-router.delete('/:id', checkId, (req, res) => {
+router.delete('/productos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     if (id < 1 || id > counter) {
         res.status(400).json({"error": "El id no pertenece a ningún producto existente."});

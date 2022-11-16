@@ -1,14 +1,14 @@
 const newProduct = () => {
-    let title = document.getElementById("title");
-    let price = document.getElementById("price");
-    let thumbnail = document.getElementById("thumbnail");
+    let title = document.getElementById("title1");
+    let price = document.getElementById("price1");
+    let thumbnail = document.getElementById("thumbnail1");
     let product = {
-        "titulo": title.value,
-        "precio": price.value,
+        "title": title.value,
+        "price": price.value,
         "thumbnail": thumbnail.value
     };
 
-    fetch('/api/products', {
+    fetch('/api/productos', {
         method: 'POST', 
         body: JSON.stringify(product),
         headers: {
