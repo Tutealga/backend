@@ -1,5 +1,4 @@
 const express = require("express");
-const { engine } = require('express-handlebars');
 
 const app = express();
 
@@ -7,9 +6,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use('/', require('./routes/products.js'));
 
-app.engine('handlebars', engine());
 app.set('views', './views');
-app.set('view engine', 'handlebars');
+app.set('view engine', 'pug');
 
 const PORT = 8080;
 
