@@ -1,0 +1,68 @@
+<section class="container">
+    <div class="row vh-100 align-items-center justify-content-center">
+<div class="col-auto">
+<div class="card bg-danger" style="width: 500px;">
+<div class="card-body">
+<div class="mb-3 text-center">
+<h1 class="text-light fw-bold">Nuevo producto</h1>
+                    <form id="form-add-product">
+                    <div class="mb-3">
+<label class="form-label fw-bold fs-5" for="title">Nombre</label>
+                         <input class="form-control" type="text" name="title" id='name-product' placeholder="Nombre del producto"/>
+                    </div> 
+                     <div class="mb-3">
+                         <label class="form-label fw-bold fs-5" for="price">Precio</label>
+                        <input class="form-control" type="number" name="price" id='price-product' placeholder="Precio del producto"/>
+                         </div>
+                     <div class="mb-3">
+                         <label class="form-label fw-bold fs-5" for="thumbnail">Thumbnail</label>
+                        <input class="form-control" type="text" id='img-product' name="thumbnail" placeholder="Thumbnail del producto"/>
+                         </div>
+                     <div class="mt-3 text-center">
+<input class="btn btn-light mb-3 fw-bold" type="submit" value='Crear producto'/>
+                     </div>         
+                    </form>                
+</div>              
+</div>          
+</div>      
+</div>
+    </div>  
+</section>
+
+<section class="container mt-0">
+    <div class="row vh-100 align-items-center justify-content-center">
+        <div class="col-auto">
+<div class="my-4 text-center">
+<h1 id="product-list" class="fw-bold text-light">Listado de productos</h1>
+            {{#if products }}
+                <table class="table" border="1" align="center" bordercolor="black" cellspacing="2">
+                    <thead>
+                        <tr class="bg-danger align-middle" align="center">
+<th class="fs-4 fw-bold text-light" style="width=200px">Titulo</th>
+                            <th class="fs-4 fw-bold text-light" style="width=200px">Precio</th>
+                            <th class="fs-4 fw-bold text-light" style="width=200px">Imagen</th>
+                        </tr>         
+                            </thead>
+                    <tbody id='table-products'></tbody>  
+                                    </table>
+            {{else}}
+                <h2 class="text-danger">No hay productos en el listado</h2>
+                {{/if}}
+</div>
+                
+        </div>
+                </div>
+                </section>
+
+<section id="chat" class='p-4 bg-secondary mt-4' style='--bs-bg-opacity: .3;'>
+	<h2 class='text-primary mb-4'>Centro de Mensajes</h2>
+	<input id='user-email' class='form-control col-6' type='mail' id='usermail' placeholder='Ingresa tu email'/>
+	<hr/>
+	<div id='table-chat' class='my-4'></div>
+	<form id='chat-form' class='form-inline'>
+		<input id='chat-message' class='form-control mb-3' type='text' name='chatmessage' placeholder='Ingresá un mensaje...'/>
+		<button class='btn btn-primary' type='submit'>Enviar</button>
+	</form>
+</section>
+                           
+
