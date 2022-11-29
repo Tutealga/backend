@@ -1,5 +1,30 @@
 # Algañaras Mateo - Backend - Coderhouse
-Desafio 5
+Desafio 6
 
-## Eleccion de motor de plantilla
-El motor de plantilla que más me gusto es el de PUG, ya que permite realizar una sintaxis mayor del codigo, y a mi parecer una mayor legibilidad. Al principio puede ser raro ya que no se acostumbra a escribir HTML de la forma en que trabaja el motor, pero a la larga me parece una mejor opcion.
+Inicializar el proyecto  
+`npm init`
+
+Instalar express  
+`npm install express`
+
+Instalar handlebars  
+`npm install express-handlebars`
+
+Instalar socket.io  
+`npm install socket.io`
+
+Verificar tener instalado nodemon de manera global sino instalarlo  
+`npm install -g nodemon`
+
+En el package.json agregar un script para correr el servidor con nodemon
+
+```javascript
+"scripts": {
+    "start": "nodemon index.js"
+}
+```
+
+index.js debería ser el nombre del archivo que levanta el servidor
+
+Correr el servidor  
+`npm run start`
