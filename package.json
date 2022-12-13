@@ -3,15 +3,18 @@
     "bootstrap": "^5.2.2",
     "express": "^4.18.2",
     "express-handlebars": "^6.0.6",
-    "nodemon": "^2.0.20"
+    "knex": "^2.3.0",
+    "mysql": "^2.18.1",
+    "socket.io": "^4.5.4",
+    "sqlite3": "^5.1.4"
   },
   "scripts": {
-    "start": "nodemon index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "name": "backend",
   "description": "",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "container.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Tutealga/backend.git"
