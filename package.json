@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "firebase-admin": "^11.4.1",
+    "mongoose": "^6.8.2"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "backend",
+  "description": "Desafio 9 - MongoDB",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tutealga/backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tutealga/backend/issues"
+  },
+  "homepage": "https://github.com/Tutealga/backend#readme"
+}
