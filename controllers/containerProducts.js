@@ -1,5 +1,5 @@
 const { Schema } = require('mongoose');
-const Container = require('../controllers/containerMongoDB.js');
+const Container = require('./containerMongoDB.js');
 
 class Products extends Container {
 	constructor() {
